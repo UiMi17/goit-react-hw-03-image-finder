@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import { StyledImageGalleryItem, StyledImage } from './StyledImageGalleryItem';
 
 export const ImageGalleryItem = ({ image }) => {
@@ -10,4 +11,12 @@ export const ImageGalleryItem = ({ image }) => {
       />
     </StyledImageGalleryItem>
   );
+};
+
+ImageGalleryItem.propTypes = {
+  image: PropTypes.shape({
+    webformatURL: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
+    largeImageURL: PropTypes.string.isRequired,
+  }),
 };

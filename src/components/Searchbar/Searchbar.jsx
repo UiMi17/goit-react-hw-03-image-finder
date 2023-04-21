@@ -1,3 +1,4 @@
+import PropTypes from 'prop-types';
 import {
   StyledSearchbar,
   StyledForm,
@@ -23,4 +24,8 @@ export const Searchbar = ({ onSubmit }) => {
       </StyledForm>
     </StyledSearchbar>
   );
+};
+
+Searchbar.propTypes = {
+  onSubmit: PropTypes.func.isRequired,
 };
