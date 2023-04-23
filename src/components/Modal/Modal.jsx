@@ -17,7 +17,7 @@ export class Modal extends Component {
         <StyledModal>
           <img
             src={image.largeImageURL}
-            alt={image.alt}
+            alt={image.tags}
             width="800"
             height="600"
           />
@@ -30,7 +30,7 @@ export class Modal extends Component {
 Modal.propTypes = {
   image: PropTypes.shape({
     largeImageURL: PropTypes.string.isRequired,
-    alt: PropTypes.string.isRequired,
+    tags: PropTypes.string.isRequired,
   }),
   handleModalClose: PropTypes.func.isRequired,
 };

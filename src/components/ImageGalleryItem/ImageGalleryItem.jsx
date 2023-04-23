@@ -3,12 +3,10 @@ import { StyledImageGalleryItem, StyledImage } from './StyledImageGalleryItem';
 
 export const ImageGalleryItem = ({ image }) => {
   return (
-    <StyledImageGalleryItem onClick={image.handleModalOpen}>
-      <StyledImage
-        src={image.webformatURL}
-        alt={image.tags}
-        data-large={image.largeImageURL}
-      />
+    <StyledImageGalleryItem
+      onClick={() => image.handleModalOpen(image.largeImageURL, image.tags)}
+    >
+      <StyledImage src={image.webformatURL} />
     </StyledImageGalleryItem>
   );
 };
@@ -16,7 +14,8 @@ export const ImageGalleryItem = ({ image }) => {
 ImageGalleryItem.propTypes = {
   image: PropTypes.shape({
     webformatURL: PropTypes.string.isRequired,
-    tags: PropTypes.string.isRequired,
     largeImageURL: PropTypes.string.isRequired,
+    tags: PropTypes.string,
+    handleModalOpen: PropTypes.func.isRequired,
   }),
 };

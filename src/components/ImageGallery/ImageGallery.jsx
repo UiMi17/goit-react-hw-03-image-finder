@@ -5,11 +5,11 @@ import { StyledImageGallery } from './StyledImageGallery';
 export const ImageGallery = ({ images, handleModalOpen }) => {
   return (
     <StyledImageGallery>
-      {images.map(({ id, webformatURL, tags, largeImageURL }) => {
+      {images.map(({ id, webformatURL, largeImageURL, tags }) => {
         return (
           <ImageGalleryItem
             key={id}
-            image={{ webformatURL, tags, largeImageURL, handleModalOpen }}
+            image={{ webformatURL, handleModalOpen, largeImageURL, tags }}
           />
         );
       })}

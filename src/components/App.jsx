@@ -10,7 +10,6 @@ import 'react-toastify/dist/ReactToastify.css';
 
 export class App extends Component {
   state = {
-    API_KEY: '34819242-61fdcfe42d1461d5acd80d71b',
     images: [],
     per_page: 12,
     currentPage: 1,
@@ -20,37 +19,13 @@ export class App extends Component {
     isModalShown: false,
     currentModalImg: {
       largeImageURL: '',
-      alt: '',
+      tags: '',
     },
   };
 
-  getImages = async () => {
-    try {
-      const API_KEY = this.state.API_KEY;
-      const perPage = this.state.per_page;
-      const currentPage = this.state.currentPage;
-      const query = this.state.query;
-
-      this.setState({ loading: true });
-      const response = await axios.get(
-        `https://pixabay.com/api/?q=${query}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${perPage}`
-      );
-      return response;
-    } catch (error) {
-      toast.error(error.message);
-    } finally {
-      this.setState({ loading: false });
-    }
-  };
-
-  onSubmit = ev => {
-    ev.preventDefault();
-
-    const inputValue = ev.currentTarget.elements.search.value;
-
-    this.setState(
-      { query: inputValue, images: [], currentPage: 1 },
-      async () => {
+  componentDidUpdate(_, prevState) {
+    if (prevState.query !== this.state.query) {
+      this.setState({ images: [], currentPage: 1 }, async () => {
         const fetchData = await this.getImages();
 
         this.setState(
@@ -74,46 +49,74 @@ export class App extends Component {
             }
           }
         );
-      }
-    );
+      });
+    } else if (prevState.currentPage !== this.state.currentPage) {
+      this.setState(
+        prevState => {
+          return {
+            images: [...prevState.images],
+          };
+        },
+        async () => {
+          const fetchData = await this.getImages();
+
+          this.setState(
+            {
+              images: [...prevState.images, ...fetchData.data.hits],
+            },
+            () => {
+              if (
+                fetchData.data.hits.length < this.state.per_page ||
+                fetchData.data.totalHits <= this.state.per_page
+              ) {
+                this.setState({ isLoadMorePresent: false });
+                toast.warning("You've reached the end of search results!");
+              }
+            }
+          );
+        }
+      );
+    }
+  }
+
+  getImages = async () => {
+    try {
+      const API_KEY = '34819242-61fdcfe42d1461d5acd80d71b';
+      const perPage = this.state.per_page;
+      const currentPage = this.state.currentPage;
+      const query = this.state.query;
+
+      this.setState({ loading: true });
+      const response = await axios.get(
+        `https://pixabay.com/api/?q=${query}&page=${currentPage}&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=${perPage}`
+      );
+      return response;
+    } catch (error) {
+      toast.error(error.message);
+    } finally {
+      this.setState({ loading: false });
+    }
+  };
+
+  onSubmit = ev => {
+    ev.preventDefault();
+
+    const inputValue = ev.currentTarget.elements.search.value;
+    this.setState({ query: inputValue });
   };
 
   handleLoadMoreBtnClick = () => {
-    this.setState(
-      prevState => {
-        return { currentPage: prevState.currentPage + 1 };
-      },
-      async () => {
-        const fetchData = await this.getImages();
-
-        this.setState(
-          prevState => {
-            return {
-              images: [...prevState.images, ...fetchData.data.hits],
-            };
-          },
-          () => {
-            if (
-              fetchData.data.hits.length < this.state.per_page ||
-              fetchData.data.totalHits <= this.state.per_page
-            ) {
-              this.setState({ isLoadMorePresent: false });
-              toast.warning("You've reached the end of search results!");
-            }
-          }
-        );
-      }
-    );
+    this.setState(prevState => {
+      return {
+        currentPage: prevState.currentPage + 1,
+      };
+    });
   };
 
-  handleModalOpen = ev => {
-    this.setState({ isModalShown: true }, () => {
-      this.setState({
-        currentModalImg: {
-          largeImageURL: ev.target.getAttribute('data-large'),
-          alt: ev.target.getAttribute('alt'),
-        },
-      });
+  handleModalOpen = (largeImageURL, tags) => {
+    this.setState({
+      currentModalImg: { largeImageURL, tags },
+      isModalShown: true,
     });
   };
 
