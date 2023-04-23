@@ -50,7 +50,10 @@ export class App extends Component {
           }
         );
       });
-    } else if (prevState.currentPage !== this.state.currentPage) {
+    } else if (
+      prevState.currentPage !== this.state.currentPage &&
+      this.state.isLoadMorePresent
+    ) {
       this.setState(
         prevState => {
           return {
