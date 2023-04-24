@@ -28,38 +28,7 @@ export class App extends Component {
       prevState.query !== this.state.query ||
       prevState.currentPage !== this.state.currentPage
     ) {
-      this.setState(
-        prevState => {
-          return {
-            images: [...prevState.images],
-          };
-        },
-        async () => {
-          const fetchedImages = await this.getImages();
-
-          this.setState(
-            prevState => {
-              return {
-                images: [...prevState.images, ...fetchedImages.data.hits],
-              };
-            },
-            () => {
-              if (fetchedImages.data.hits.length === 0) {
-                this.setState({ isLoadMorePresent: false });
-                toast.warning("Sorry, there's no images found!");
-              } else if (
-                fetchedImages.data.hits.length < this.state.per_page ||
-                fetchedImages.data.totalHits <= this.state.per_page
-              ) {
-                this.setState({ isLoadMorePresent: false });
-                toast.warning("You've reached the end of search results!");
-              } else {
-                this.setState({ isLoadMorePresent: true });
-              }
-            }
-          );
-        }
-      );
+      this.handleStateUpdate();
     }
   }
 
@@ -108,6 +77,32 @@ export class App extends Component {
     if (ev.code === 'Escape' || ev.target === ev.currentTarget) {
       this.setState({ isModalShown: false });
     }
+  };
+
+  handleStateUpdate = async () => {
+    const fetchedImages = await this.getImages();
+
+    this.setState(
+      prevState => {
+        return {
+          images: [...prevState.images, ...fetchedImages.data.hits],
+        };
+      },
+      () => {
+        if (fetchedImages.data.hits.length === 0) {
+          this.setState({ isLoadMorePresent: false });
+          toast.warning("Sorry, there's no images found!");
+        } else if (
+          fetchedImages.data.hits.length < this.state.per_page ||
+          fetchedImages.data.totalHits <= this.state.per_page
+        ) {
+          this.setState({ isLoadMorePresent: false });
+          toast.warning("You've reached the end of search results!");
+        } else {
+          this.setState({ isLoadMorePresent: true });
+        }
+      }
+    );
   };
 
   render() {
