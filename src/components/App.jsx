@@ -24,35 +24,9 @@ export class App extends Component {
   };
 
   componentDidUpdate(_, prevState) {
-    if (prevState.query !== this.state.query) {
-      this.setState({ images: [], currentPage: 1 }, async () => {
-        const fetchData = await this.getImages();
-
-        this.setState(
-          prevState => {
-            return {
-              images: [...prevState.images, ...fetchData.data.hits],
-            };
-          },
-          () => {
-            if (fetchData.data.hits.length === 0) {
-              this.setState({ isLoadMorePresent: false });
-              toast.warning("Sorry, there's no images found!");
-            } else if (
-              fetchData.data.hits.length < this.state.per_page ||
-              fetchData.data.totalHits <= this.state.per_page
-            ) {
-              this.setState({ isLoadMorePresent: false });
-              toast.warning("You've reached the end of search results!");
-            } else {
-              this.setState({ isLoadMorePresent: true });
-            }
-          }
-        );
-      });
-    } else if (
-      prevState.currentPage !== this.state.currentPage &&
-      this.state.isLoadMorePresent
+    if (
+      prevState.query !== this.state.query ||
+      prevState.currentPage !== this.state.currentPage
     ) {
       this.setState(
         prevState => {
@@ -61,19 +35,26 @@ export class App extends Component {
           };
         },
         async () => {
-          const fetchData = await this.getImages();
+          const fetchedImages = await this.getImages();
 
           this.setState(
-            {
-              images: [...prevState.images, ...fetchData.data.hits],
+            prevState => {
+              return {
+                images: [...prevState.images, ...fetchedImages.data.hits],
+              };
             },
             () => {
-              if (
-                fetchData.data.hits.length < this.state.per_page ||
-                fetchData.data.totalHits <= this.state.per_page
+              if (fetchedImages.data.hits.length === 0) {
+                this.setState({ isLoadMorePresent: false });
+                toast.warning("Sorry, there's no images found!");
+              } else if (
+                fetchedImages.data.hits.length < this.state.per_page ||
+                fetchedImages.data.totalHits <= this.state.per_page
               ) {
                 this.setState({ isLoadMorePresent: false });
                 toast.warning("You've reached the end of search results!");
+              } else {
+                this.setState({ isLoadMorePresent: true });
               }
             }
           );
@@ -105,7 +86,7 @@ export class App extends Component {
     ev.preventDefault();
 
     const inputValue = ev.currentTarget.elements.search.value;
-    this.setState({ query: inputValue });
+    this.setState({ query: inputValue, images: [], currentPage: 1 });
   };
 
   handleLoadMoreBtnClick = () => {
